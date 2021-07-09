@@ -1,0 +1,42 @@
+bases:
+- ../../cjworkbench-deploy/kubernetes/overlays/aws
+
+replicas:
+- name: fetcher-deployment
+  count: 2
+- name: renderer-deployment
+  count: 2
+- name: frontend-deployment
+  count: 2
+
+configMapGenerator:
+- name: workbench-config
+  literals:
+  - domainName=data.meedan.com
+- name: acm-ssl-certs
+  literals:
+  - app=arn:aws:acm:us-east-1:079475148015:certificate/2b752899-ceea-4c88-a530-bb3c3f47c5d9
+  - upload=arn:aws:acm:us-east-1:079475148015:certificate/72819cea-16f7-41e4-8b42-640d2dbca94d
+
+vars:
+- name: DOMAIN_NAME
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: workbench-config
+  fieldref:
+    fieldpath: data.domainName
+- name: APP_CERT_ARN
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: acm-ssl-certs
+  fieldref:
+    fieldpath: data.app
+- name: UPLOAD_CERT_ARN
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: acm-ssl-certs
+  fieldref:
+    fieldpath: data.upload
