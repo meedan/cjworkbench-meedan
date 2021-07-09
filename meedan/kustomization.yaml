@@ -1,6 +1,9 @@
 bases:
 - ../../cjworkbench-deploy/kubernetes/overlays/aws
 
+components:
+- ../components/config
+
 replicas:
 - name: fetcher-deployment
   count: 2
@@ -10,9 +13,6 @@ replicas:
   count: 2
 
 configMapGenerator:
-- name: workbench-config
-  literals:
-  - domainName=data.meedan.com
 - name: acm-ssl-certs
   literals:
   - app=arn:aws:acm:us-east-1:079475148015:certificate/2b752899-ceea-4c88-a530-bb3c3f47c5d9

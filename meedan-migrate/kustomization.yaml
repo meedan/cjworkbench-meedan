@@ -1,2 +1,5 @@
 bases:
 - ../../cjworkbench-deploy/kubernetes/overlays/aws-migrate
+
+components:
+- ../components/config
