@@ -4,7 +4,7 @@
 mkdir -p ~/src/cjworkbench
 git clone git@github.com:CJWorkbench/cjworkbench.git
 git clone git@github.com:CJWorkbench/cjworkbench-deploy.git
-git clone git@github.com:CJWorkbench/cjworkbench-meedan.git
+git clone git@github.com:meedan/cjworkbench-meedan.git
 # ... and set up kubectl to connect to our cluster
 ```
 
