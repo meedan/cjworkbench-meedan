@@ -1,5 +1,5 @@
 bases:
-- ../../cjworkbench-deploy/kubernetes/overlays/aws
+- ../kubernetes/overlays/aws
 
 components:
 - ../components/config
@@ -15,8 +15,8 @@ replicas:
 configMapGenerator:
 - name: acm-ssl-certs
   literals:
-  - app=arn:aws:acm:us-east-1:079475148015:certificate/2b752899-ceea-4c88-a530-bb3c3f47c5d9
-  - upload=arn:aws:acm:us-east-1:079475148015:certificate/72819cea-16f7-41e4-8b42-640d2dbca94d
+  - app=arn:aws:acm:eu-west-1:848416313321:certificate/dfc5e999-b848-47c4-a7cb-a3722eed5ddf
+  - upload=arn:aws:acm:eu-west-1:848416313321:certificate/dfc5e999-b848-47c4-a7cb-a3722eed5ddf
 
 vars:
 - name: DOMAIN_NAME
