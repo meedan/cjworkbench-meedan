@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: tusd-hooks-service
+spec:
+  type: ClusterIP
+  selector:
+    app: tusd-hooks-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8080

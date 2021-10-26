@@ -1,0 +1,43 @@
+#!/bin/sh
+
+set -e
+
+function ask_for_bug_report () {
+  cat >&2 <<EOT
+
+You think you found a bug. You're trying to hide it.
+
+Please file a bug report on GitHub or Pivotal Tracker RIGHT NOW. Include:
+
+* Steps to reproduce, expected results and actual results.
+* A timestamp, accurate to the second if possible, including timezone.
+* An explanation: what do you expect will change when you restart this service?
+
+EOT
+}
+
+function usage () {
+  cat >&2 <<EOT
+Usage: $0 SERVICE
+
+Where:
+* SERVICE is one of 'frontend', 'cron', 'fetcher', 'worker'
+EOT
+  ask_for_bug_report
+  exit 1
+}
+
+SERVICE="$1"
+
+[ "$SERVICE" = cron -o "$SERVICE" = fetcher -o "$SERVICE" = frontend -o "$SERVICE" = renderer ] || usage
+
+CLUSTER="workbench"
+
+echo -n "Triggering rollout of $SERVICE on $ENV..." >&2
+kubectl.1.19 --cluster $CLUSTER rollout restart deployment $SERVICE-deployment
+echo -n 'Waiting for rollout to finish...' >&2
+kubectl.1.19 --cluster $CLUSTER rollout status deployment/$SERVICE-deployment >/dev/null
+echo ' done' >&2
+
+echo >&2
+echo 'Inspect services at https://eu-west-1.console.aws.amazon.com/eks/home?region=eu-west-1#/clusters' >&2

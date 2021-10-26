@@ -1,0 +1,38 @@
+bases:
+- ../gke
+
+resources:
+- tusd-cert.yaml
+- frontend-cert.yaml
+
+components:
+- ../components/stripe
+- ../components/facebook-login
+- ../components/google-login-and-module
+- ../components/twitter-login-and-module
+- ../components/intercom-module
+- ../components/intercom-identity-verification
+- ../components/production-common
+- ../../versions
+
+replicas:
+- name: fetcher-deployment
+  count: 7
+- name: renderer-deployment
+  count: 3
+- name: frontend-deployment
+  count: 4
+
+configMapGenerator:
+- name: cjw-google-analytics
+  behavior: replace
+  literals:
+  - CJW_GOOGLE_ANALYTICS=UA-104106561-1
+- name: cjw-heap-analytics
+  behavior: replace
+  literals:
+  - CJW_HEAP_ANALYTICS_ID=70406982
+- name: cjw-intercom
+  behavior: replace
+  literals:
+  - CJW_INTERCOM_APP_ID=u25xg9c6

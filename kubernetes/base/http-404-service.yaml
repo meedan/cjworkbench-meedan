@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: http-404-service
+spec:
+  type: ClusterIP
+  selector:
+    app: http-404-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8080

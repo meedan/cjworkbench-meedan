@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e
+
+CLUSTER="workbench"
+KUBECTL="kubectl.1.19 --cluster $CLUSTER"
+FRONTEND_POD="$($KUBECTL get pods -lapp=frontend-app -oname | head -n1 | cut -d/ -f2)"
+
+$KUBECTL exec -it "$FRONTEND_POD" -c app -- sh -c 'PGPASSWORD="$CJW_DB_PASSWORD" PGUSER="cjworkbench" PGHOST="localhost" PGDATABASE="cjworkbench" exec psql'

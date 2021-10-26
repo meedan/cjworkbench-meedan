@@ -1,0 +1,101 @@
+#!/bin/bash
+
+set -e
+set -x
+
+SHA=${1:?"Usage: $0 SHA"}
+DIR="$(dirname "$0")"
+
+CLUSTER="workbench"
+OVERLAY="kubernetes/overlays/production"
+
+echo "Deploying $OVERLAY to CLUSTER=$CLUSTER >&2"
+
+if test -n "$PS1"; then
+  echo "If you're not sure about this, press Ctrl+C now!"
+  sleep 3
+fi
+
+KUBECTL="kubectl.1.19 --cluster $CLUSTER"
+
+fail () {
+  echo "FAIL: $1" >&2
+  exit 1
+}
+
+set_versions () {
+  (cd "$DIR/kubernetes/versions" \
+    && for image in upload-assets migrate cron frontend fetcher renderer; do kustomize edit set image gcr.io/workbenchdata-ci/$image=*:"$SHA"; done \
+  )
+}
+
+wait_for_pod_to_exist () {
+  # kubectl wait is not the command for us:
+  # https://github.com/kubernetes/kubernetes/issues/83242
+  while true; do
+    $KUBECTL get pod "$1" && break || sleep 1
+  done
+
+  # Avoid races: don't check for Ready because a completed pod is not "Ready".
+  while test "$($KUBECTL get pod "$1" -ojsonpath='{.status.phase}')" = "Pending"; do
+    sleep 1  # wait
+  done
+}
+
+wait_for_pod_success () {
+  # When a pod finally finishes, it's either "Succeeded" or "Failed".
+  # ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-phase
+  while true; do
+    pod_status="$($KUBECTL get pod "$1" -ojsonpath='{.status.phase}')"
+    if test "$pod_status" = "Succeeded"; then
+      break
+    fi
+    if test "$pod_status" = "Failed"; then
+      fail "$2"
+    fi
+    sleep 1  # and loop, indefinitely
+  done
+}
+
+run_migrations() {
+  migration_id="$RANDOM"
+  # Don't worry about races. If three migrations -- same versions or otherwise --
+  # run concurrently, that should be fine. The pods themselves must handle these
+  # issues.
+  (cd "$DIR/$OVERLAY-migrate" \
+    && kustomize edit set namesuffix -- "-$SHA-$migration_id" \
+    && kustomize build | $KUBECTL apply -f -
+  )
+
+  echo "Started migrations. Let's check on them..." >&2
+  wait_for_pod_to_exist "migrate-update-database-schema-$SHA-$migration_id"
+  $KUBECTL logs --follow --all-containers --timestamps "migrate-update-database-schema-$SHA-$migration_id"
+  wait_for_pod_to_exist "migrate-upload-assets-to-s3-$SHA-$migration_id"
+  $KUBECTL logs --follow --all-containers --timestamps "migrate-upload-assets-to-s3-$SHA-$migration_id"
+
+  echo "Checking for success..." >&2
+  wait_for_pod_success "migrate-upload-assets-to-s3-$SHA-$migration_id" "Uploading assets failed"
+  wait_for_pod_success "migrate-update-database-schema-$SHA-$migration_id" "Updating database schema filed"
+
+  echo "Cleaning up..." >&2
+  (cd "$DIR/$OVERLAY-migrate" \
+    && kustomize build | $KUBECTL delete --wait -f -
+  )
+}
+
+apply_latest_services() {
+  echo -n "Applying latest config..." >&2
+  (cd "$DIR/$OVERLAY" \
+    && kustomize build . | $KUBECTL apply -f -)
+}
+
+set_versions
+run_migrations >&2
+apply_latest_services >&2
+
+echo -n 'Waiting for rollout to finish' >&2
+for service in cron cron-delta-deleter cron-expired-session-deleter cron-lesson-workflow-deleter fetcher renderer frontend; do
+  $KUBECTL rollout status deployment/$service-deployment >/dev/null
+  echo -n '.' >&2
+done
+echo ' done' >&2

@@ -1,0 +1,37 @@
+resources:
+- cron-delta-deleter.yaml
+- cron-deployment.yaml
+- cron-expired-session-deleter.yaml
+- cron-lesson-workflow-deleter.yaml
+- fetcher-deployment.yaml
+- frontend-deployment.yaml
+- frontend-internal-tusd-hooks-service.yaml
+- frontend-service.yaml
+- frontend-ingress.yaml
+- tusd-hooks-deployment.yaml
+- tusd-hooks-service.yaml
+- intercom-sink-deployment.yaml
+- renderer-deployment.yaml
+- http-404-deployment.yaml
+- http-404-service.yaml
+- tusd-deployment.yaml
+- tusd-service.yaml
+- tusd-internal-service.yaml
+- tusd-ingress.yaml
+
+components:
+- ../versions
+
+configMapGenerator:
+- name: workbench-config
+  literals:
+  - domainName=
+- name: cjw-google-analytics
+  literals:
+  - CJW_GOOGLE_ANALYTICS=
+- name: cjw-heap-analytics
+  literals:
+  - CJW_HEAP_ANALYTICS_ID=
+- name: cjw-intercom
+  literals:
+  - CJW_INTERCOM_APP_ID=
