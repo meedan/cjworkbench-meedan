@@ -20,11 +20,6 @@ jobs:
         repository: CJWorkbench/cjworkbench
         path: ./
 
-    - uses: actions/checkout@v2
-      with:
-        repository: CJWorkbench/cjworkbench-deploy
-        path: ./
-
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
