@@ -18,11 +18,12 @@ ENV="production"  # "staging" or "production"
 CLUSTER_NAME="workbench"
 AWS_REGION=eu-west-1
 KUBERNETES_VERSION=1.20
-$DOMAIN_NAME  # or exit
 DIR="$(dirname "$0")"
 
 ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
 
+# From readme, the cluster itself should exist before this step.
+# This is to ensure EKS access
 eksctl create cluster \
   --name $CLUSTER_NAME \
   --version "$KUBERNETES_VERSION" \
