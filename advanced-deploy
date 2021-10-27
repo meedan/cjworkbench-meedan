@@ -16,7 +16,7 @@ if test -n "$PS1"; then
   sleep 3
 fi
 
-KUBECTL="kubectl.1.19 --cluster $CLUSTER"
+KUBECTL="kubectl --cluster $CLUSTER"
 
 fail () {
   echo "FAIL: $1" >&2
@@ -25,7 +25,7 @@ fail () {
 
 set_versions () {
   (cd "$DIR/kubernetes/versions" \
-    && for image in upload-assets migrate cron frontend fetcher renderer; do kustomize edit set image gcr.io/workbenchdata-ci/$image=*:"$SHA"; done \
+    && for image in upload-assets migrate cron frontend fetcher renderer; do kustomize edit set image 848416313321.dkr.ecr.eu-west-1.amazonaws.com/workbench:${SHA}; done \
   )
 }
 
