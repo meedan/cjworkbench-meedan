@@ -6,8 +6,8 @@ set -x
 SHA=${1:?"Usage: $0 SHA"}
 DIR="$(dirname "$0")"
 
-CLUSTER="workbench"
-OVERLAY="kubernetes/overlays/production"
+export CLUSTER="workbench"
+export OVERLAY="kubernetes/overlays/production"
 
 echo "Deploying $OVERLAY to CLUSTER=$CLUSTER >&2"
 
@@ -15,6 +15,8 @@ if test -n "$PS1"; then
   echo "If you're not sure about this, press Ctrl+C now!"
   sleep 3
 fi
+
+aws eks --region eu-west-1 update-kubeconfig --name workbench
 
 KUBECTL="kubectl --cluster $CLUSTER"
 
@@ -90,7 +92,7 @@ apply_latest_services() {
 }
 
 set_versions
-run_migrations >&2
+#run_migrations >&2
 apply_latest_services >&2
 
 echo -n 'Waiting for rollout to finish' >&2

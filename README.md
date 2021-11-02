@@ -38,6 +38,9 @@ cd cjworkbench-meedan
 
 # Deploy cluster
 
+WARING: cluster-setup is NOT idempotent. If you encounter errors during execution,
+it is recommended that you destroy and recreate cluster resources.
+
 ```bash
 cd cluster-setup/aws
 ./cluster-setup.sh
