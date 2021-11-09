@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: "gcr.io/workbenchdata-ci/cjw-intercom-sink:REPLACEME"
+        image: "848416313321.dkr.ecr.eu-west-1.amazonaws.com/workbench:632e44285e65d97fcedebddd5ac12c37ff62c431"
         resources:
           requests:
             cpu: 150m

@@ -23,16 +23,3 @@ replicas:
 - name: frontend-deployment
   count: 4
 
-configMapGenerator:
-- name: cjw-google-analytics
-  behavior: replace
-  literals:
-  - CJW_GOOGLE_ANALYTICS=UA-104106561-1
-- name: cjw-heap-analytics
-  behavior: replace
-  literals:
-  - CJW_HEAP_ANALYTICS_ID=70406982
-- name: cjw-intercom
-  behavior: replace
-  literals:
-  - CJW_INTERCOM_APP_ID=u25xg9c6

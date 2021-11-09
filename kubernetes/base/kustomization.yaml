@@ -19,8 +19,8 @@ resources:
 - tusd-internal-service.yaml
 - tusd-ingress.yaml
 
-components:
-- ../versions
+#components:
+#- ../versions
 
 configMapGenerator:
 - name: workbench-config
